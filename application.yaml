@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: container-app-dev
+  namespace: argocd
+spec:
+  source:
+    repoURL: https://github.com/Mithilesh112011/<this-repo-name>.git
+    targetRevision: HEAD
+    path: apps/container-app/overlays/dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: container-app-dev
+  project: apps
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
