@@ -5,7 +5,7 @@ metadata:
   namespace: argocd
 spec:
   source:
-    repoURL: https://github.com/Mithilesh112011/<this-repo-name>.git
+    repoURL: https://git.cocci.com/dev/ach-manager-argo.git
     targetRevision: HEAD
     path: apps/container-app/overlays/dev
   destination:
