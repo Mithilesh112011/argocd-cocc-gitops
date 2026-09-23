@@ -1,26 +1,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: container-app-1
+  name: ach-manager
   labels:
-    app: container-app-1
+    app: ach-manager
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: container-app-1
+      app: ach-manager
   template:
     metadata:
       labels:
-        app: container-app-1
+        app: ach-manager
     spec:
       imagePullSecrets:
         - name: gitlab-registry-secret
+
       containers:
-        - name: container-app-1
-          image: registry.gitlab.com/<group>/<project>/<image-1>:latest
+        - name: ach-manager
+          image: ach-manager # rewritten by images: block in overlay kustomization.yaml
           ports:
-            - containerPort: 8080
+            - name: http
+              containerPort: 8080
+
           resources:
             requests:
               cpu: 100m
@@ -28,6 +31,36 @@ spec:
             limits:
               cpu: 500m
               memory: 256Mi
+
+          envFrom:
+            - configMapRef:
+                name: ach-manager-config
+
+          env:
+            - name: DB_HOST
+              value: "ach-manager-postgres"
+
+            - name: DB_PORT
+              value: "5432"
+
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: ach-manager-db-credentials
+                  key: dbname
+
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: ach-manager-db-credentials
+                  key: username
+
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ach-manager-db-credentials
+                  key: password
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -47,11 +80,14 @@ spec:
     spec:
       imagePullSecrets:
         - name: gitlab-registry-secret
+
       containers:
         - name: container-app-2
           image: registry.gitlab.com/<group>/<project>/<image-2>:latest
           ports:
-            - containerPort: 8080
+            - name: http
+              containerPort: 8080
+
           resources:
             requests:
               cpu: 100m
