@@ -65,33 +65,83 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: container-app-2
+  name: ach-manager-postgres
   labels:
-    app: container-app-2
+    app: ach-manager-postgres
+
 spec:
-  replicas: 2
+  replicas: 1
+
   selector:
     matchLabels:
-      app: container-app-2
+      app: ach-manager-postgres
+
   template:
     metadata:
       labels:
-        app: container-app-2
+        app: ach-manager-postgres
+
     spec:
       imagePullSecrets:
         - name: gitlab-registry-secret
 
       containers:
-        - name: container-app-2
-          image: registry.gitlab.com/<group>/<project>/<image-2>:latest
+        - name: postgres
+          image: postgres:16
+
           ports:
-            - name: http
-              containerPort: 8080
+            - name: postgres
+              containerPort: 5432
+
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: ach-manager-db-credentials
+                  key: dbname
+
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: ach-manager-db-credentials
+                  key: username
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ach-manager-db-credentials
+                  key: password
+
+          volumeMounts:
+            - name: pgdata
+              mountPath: /var/lib/postgresql/data
+              subPath: pgdata
 
           resources:
             requests:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 250m
+              memory: 512Mi
             limits:
-              cpu: 500m
-              memory: 256Mi
+              cpu: "1"
+              memory: 1Gi
+
+      volumes:
+        - name: pgdata
+          persistentVolumeClaim:
+            claimName: ach-manager-postgres-pvc
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ach-manager-postgres-pvc
+
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 10Gi
+
+  # storageClassName: <TODO — confirm gold/silver storage class name with SRE>
