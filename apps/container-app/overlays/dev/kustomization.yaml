@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: container-app-dev
 resources:
   - ../../base
+  - ingress.yaml
 images:
   - name: registry.gitlab.com/<group>/<project>/<image-1>
     newTag: v1.0.0
