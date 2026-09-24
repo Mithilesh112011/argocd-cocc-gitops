@@ -5,7 +5,8 @@ resources:
   - ../../base
   - ingress.yaml
 images:
-  - name: registry.gitlab.com/<group>/<project>/<image-1>
+  - name: 
+    newName: git.cocci.com:5050/<group>/<app>  ###  registry.gitlab.com/<group>/<project>/<image-1>
     newTag: v1.0.0
   - name: registry.gitlab.com/<group>/<project>/<image-2>
     newTag: v1.0.0
