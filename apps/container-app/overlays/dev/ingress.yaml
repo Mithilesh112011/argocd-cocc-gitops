@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sre-docs-ingress
+  annotations:
+spec:
+  rules:
+    - host: sre.aldev.k8s.cocci.com
+      http:
+        paths:
+          - path: /docs
+            pathType: Prefix
+            backend:
+              service:
+                name: sre-docs
+                port:
+                  number: 8080
