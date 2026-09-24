@@ -1,0 +1,7 @@
+role: standard
+os: linux
+site: avon
+security_zone: dev
+distro: tkgi
+lifecycle: dev
+kargo: true
